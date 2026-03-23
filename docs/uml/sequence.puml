@@ -1,0 +1,20 @@
+@startuml PolyMind - Sequence Diagram
+
+actor User
+participant "Vue.js" as Vue
+participant "Symfony" as Symfony
+participant "FastAPI Router" as FastAPI
+participant "AI APIs\n(OpenAI/Claude/Gemini)" as AI
+
+User -> Vue : Send prompt
+Vue -> Symfony : POST /api/chat
+Symfony -> Symfony : Auth + validate JWT
+Symfony -> FastAPI : POST /route\n{prompt, user_id}
+FastAPI -> AI : Analyze intent\n(routing LLM call)
+FastAPI -> AI : Route to best model
+AI --> FastAPI : AI response
+FastAPI --> Symfony : Return response + model used
+Symfony --> Vue : Save history + respond
+Vue --> User : Display response + show model used
+
+@enduml
