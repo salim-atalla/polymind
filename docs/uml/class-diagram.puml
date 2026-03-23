@@ -1,0 +1,65 @@
+@startuml PolyMind - Class Diagram
+
+class User {
+  + id: uuid
+  + email: string
+  + password: string
+  + role: enum
+  + createdAt: datetime
+  --
+  + getConversations()
+  + getRoles(): array
+}
+
+class Conversation {
+  + id: uuid
+  + title: string
+  + userId: uuid
+  + createdAt: datetime
+  + updatedAt: datetime
+  --
+  + getMessages()
+  + getLastMessage()
+}
+
+class Message {
+  + id: uuid
+  + conversationId: uuid
+  + role: enum
+  + content: text
+  + aiModelId: uuid
+  + createdAt: datetime
+  --
+  + getAiModel()
+  + isFromUser(): bool
+}
+
+class AiModel {
+  + id: uuid
+  + name: string
+  + provider: string
+  + intentType: enum
+  + apiEndpoint: string
+  + isActive: boolean
+  --
+  + isAvailable(): bool
+  + getIntentTypes()
+}
+
+class RoutingLog {
+  + id: uuid
+  + messageId: uuid
+  + detectedIntent: string
+  + modelSelected: string
+  + responseTime: int
+  --
+  + getSummary()
+  + getResponseTime()
+}
+
+User         "1" -- "*" Conversation
+Conversation "1" -- "*" Message
+Message      "*" -- "1" AiModel
+Message      "1" -- "1" RoutingLog
+
+@enduml
