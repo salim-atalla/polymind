@@ -1,0 +1,20 @@
+# PHP / Symfony
+symfony-app/vendor/
+symfony-app/.env.local
+symfony-app/var/
+
+# Python
+fastapi-router/__pycache__/
+fastapi-router/.env
+fastapi-router/venv/
+
+# Vue.js
+frontend/node_modules/
+frontend/dist/
+
+# Docker
+.env
+
+# OS
+.DS_Store
+Thumbs.db
