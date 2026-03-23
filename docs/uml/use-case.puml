@@ -1,0 +1,39 @@
+@startuml PolyMind - Use Case Diagram
+
+left to right direction
+
+actor User
+actor Admin
+actor "FastAPI Router" as FastAPI
+
+rectangle "PolyMind System" {
+  usecase "Register / Login"   as UC1
+  usecase "Manage profile"     as UC2
+  usecase "Send prompt"        as UC3
+  usecase "View AI model used" as UC4
+  usecase "View chat history"  as UC5
+  usecase "Manage users"       as UC6
+  usecase "Configure AI models" as UC7
+  usecase "View usage stats"   as UC8
+  usecase "Analyze prompt"     as UC9
+  usecase "Route to best AI"   as UC10
+  usecase "Call AI API"        as UC11
+}
+
+User  --> UC1
+User  --> UC2
+User  --> UC3
+User  --> UC4
+User  --> UC5
+
+Admin --> UC6
+Admin --> UC7
+Admin --> UC8
+
+UC3  ..> UC9  : <<include>>
+UC9  ..> UC10 : <<include>>
+UC10 ..> UC11 : <<include>>
+
+FastAPI --> UC11
+
+@enduml
