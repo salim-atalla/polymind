@@ -1,0 +1,30 @@
+@startuml PolyMind - Architecture Diagram
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User", "Uses the chat interface")
+
+System_Boundary(docker, "Docker Network — polymind_net") {
+  Container(vue,      "Vue.js",           "Vite · port 5173",  "Chat UI")
+  Container(symfony,  "Symfony (PHP 8.2)","Nginx + php-fpm · port 8080", "API gateway, auth, chat history")
+  Container(fastapi,  "FastAPI",          "Python · port 8000","AI router, prompt analysis")
+  ContainerDb(pg,     "PostgreSQL",       "port 5432",         "Users, conversations, messages")
+  ContainerDb(redis,  "Redis",            "port 6379",         "Cache, sessions")
+}
+
+System_Ext(openai,  "OpenAI",  "Text, emails, summaries")
+System_Ext(claude,  "Claude",  "Code generation")
+System_Ext(gemini,  "Gemini",  "Image generation")
+System_Ext(ci,      "GitHub Actions", "CI/CD pipeline")
+
+Rel(user,    vue,     "Uses",         "HTTPS")
+Rel(vue,     symfony, "Calls",        "HTTP REST")
+Rel(symfony, fastapi, "Routes prompt","HTTP POST")
+Rel(symfony, pg,      "Reads/Writes", "Doctrine ORM")
+Rel(symfony, redis,   "Cache",        "Redis client")
+Rel(fastapi, openai,  "Calls",        "HTTPS")
+Rel(fastapi, claude,  "Calls",        "HTTPS")
+Rel(fastapi, gemini,  "Calls",        "HTTPS")
+Rel(ci,      symfony, "Deploys",      "Docker")
+
+@enduml
