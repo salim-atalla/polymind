@@ -1,11 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from enum import Enum
 
 class IntentType(str, Enum):
-    TEXT       = "text"
-    CODE       = "code"
-    IMAGE      = "image"
-    GENERAL    = "general"
+    TEXT    = "text"
+    CODE    = "code"
+    IMAGE   = "image"
+    GENERAL = "general"
 
 class RouteRequest(BaseModel):
     prompt: str
@@ -13,8 +13,10 @@ class RouteRequest(BaseModel):
     conversation_id: str | None = None
 
 class RouteResponse(BaseModel):
-    response: str
-    model_used: str
-    provider: str
-    detected_intent: IntentType
+    model_config = ConfigDict(protected_namespaces=())
+
+    response:         str
+    model_used:       str
+    provider:         str
+    detected_intent:  IntentType
     response_time_ms: int
