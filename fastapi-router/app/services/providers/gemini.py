@@ -7,11 +7,11 @@ genai.configure(api_key=settings.gemini_api_key)
 
 async def call_gemini(prompt: str) -> dict:
     try:
-        model    = genai.GenerativeModel("gemini-1.5-pro")
+        model = genai.GenerativeModel("gemini-2.0-flash-lite")
         response = await model.generate_content_async(prompt)
         return {
             "response": response.text,
-            "model":    "gemini-1.5-pro",
+            "model":    "gemini-2.0-flash-lite",
             "provider": "google",
         }
     except Exception as e:
