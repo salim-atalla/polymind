@@ -1,0 +1,26 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: PolyMind API
+            description: |
+                ## 🧠 PolyMind — Intelligent AI Router API
+
+                This is the Symfony backend API for PolyMind.
+                It handles authentication, chat routing, and conversation history.
+
+                ### Authentication
+                All endpoints except `/api/auth/register` and `/api/auth/login` 
+                require a Bearer JWT token in the Authorization header.
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []
+    areas:
+        default:
+            path_patterns:
+                - ^/api(?!/doc)

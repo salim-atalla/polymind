@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use OpenApi\Attributes as OA;
 
 #[Route('/api/chat')]
 class ChatController extends AbstractController
@@ -21,6 +22,36 @@ class ChatController extends AbstractController
         private FastApiClient          $fastApiClient,
     ) {}
 
+    #[OA\Post(
+        path: '/api/chat',
+        summary: 'Send a prompt and get AI response',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['prompt'],
+                properties: [
+                    new OA\Property(
+                        property: 'prompt',
+                        type: 'string',
+                        example: 'Write a Python hello world'
+                    ),
+                    new OA\Property(
+                        property: 'conversation_id',
+                        type: 'string',
+                        nullable: true,
+                        example: 'uuid-here'
+                    ),
+                ]
+            )
+        ),
+        tags: ['Chat'],
+        responses: [
+            new OA\Response(response: 201, description: 'AI response returned successfully'),
+            new OA\Response(response: 400, description: 'Prompt is required'),
+            new OA\Response(response: 401, description: 'Unauthorized'),
+            new OA\Response(response: 503, description: 'AI service unavailable'),
+        ]
+    )]
     #[Route('', name: 'chat_send', methods: ['POST'])]
     public function send(Request $request): JsonResponse
     {

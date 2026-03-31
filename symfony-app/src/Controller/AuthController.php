@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use OpenApi\Attributes as OA;
 
 #[Route('/api/auth')]
 class AuthController extends AbstractController
@@ -22,6 +23,36 @@ class AuthController extends AbstractController
         private ValidatorInterface          $validator,
     ) {}
 
+    #[OA\Post(
+        path: '/api/auth/register',
+        summary: 'Register a new user',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email', 'password', 'fullName'],
+                properties: [
+                    new OA\Property(property: 'email',    type: 'string', example: 'user@example.com'),
+                    new OA\Property(property: 'password', type: 'string', example: 'password123'),
+                    new OA\Property(property: 'fullName', type: 'string', example: 'John Doe'),
+                ]
+            )
+        ),
+        tags: ['Authentication'],
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'User registered successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'token', type: 'string'),
+                        new OA\Property(property: 'user',  type: 'object'),
+                    ]
+                )
+            ),
+            new OA\Response(response: 409, description: 'Email already in use'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
     #[Route('/register', name: 'auth_register', methods: ['POST'])]
     public function register(Request $request): JsonResponse
     {
@@ -69,6 +100,15 @@ class AuthController extends AbstractController
         ], 201);
     }
 
+    #[OA\Get(
+        path: '/api/auth/me',
+        summary: 'Get current authenticated user',
+        tags: ['Authentication'],
+        responses: [
+            new OA\Response(response: 200, description: 'Current user data'),
+            new OA\Response(response: 401, description: 'Unauthorized'),
+        ]
+    )]
     #[Route('/me', name: 'auth_me', methods: ['GET'])]
     public function me(): JsonResponse
     {

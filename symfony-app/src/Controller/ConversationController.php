@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use OpenApi\Attributes as OA;
 
 #[Route('/api/conversations')]
 class ConversationController extends AbstractController
@@ -18,6 +19,15 @@ class ConversationController extends AbstractController
         private ConversationRepository  $conversationRepo,
     ) {}
 
+    #[OA\Get(
+        path: '/api/conversations',
+        summary: 'List all conversations for current user',
+        tags: ['Conversations'],
+        responses: [
+            new OA\Response(response: 200, description: 'List of conversations'),
+            new OA\Response(response: 401, description: 'Unauthorized'),
+        ]
+    )]
     #[Route('', name: 'conversations_list', methods: ['GET'])]
     public function list(): JsonResponse
     {
@@ -35,6 +45,18 @@ class ConversationController extends AbstractController
         ], $conversations));
     }
 
+    #[OA\Get(
+        path: '/api/conversations/{id}',
+        summary: 'Get a conversation with all messages',
+        tags: ['Conversations'],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Conversation with messages'),
+            new OA\Response(response: 404, description: 'Conversation not found'),
+        ]
+    )]
     #[Route('/{id}', name: 'conversation_show', methods: ['GET'])]
     public function show(string $id): JsonResponse
     {
@@ -63,6 +85,18 @@ class ConversationController extends AbstractController
         ]);
     }
 
+    #[OA\Delete(
+        path: '/api/conversations/{id}',
+        summary: 'Delete a conversation',
+        tags: ['Conversations'],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Conversation deleted'),
+            new OA\Response(response: 404, description: 'Conversation not found'),
+        ]
+    )]
     #[Route('/{id}', name: 'conversation_delete', methods: ['DELETE'])]
     public function delete(string $id): JsonResponse
     {
