@@ -115,6 +115,10 @@ class AuthController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
+        if (!$user) {
+            return $this->json(['error' => 'Unauthorized'], 401);
+        }
+
         return $this->json([
             'id'        => $user->getId(),
             'email'     => $user->getEmail(),
