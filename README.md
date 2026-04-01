@@ -4,12 +4,14 @@
 
 ### One chat interface. Multiple AI brains. Always the right one.
 
-![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php)
-![Symfony](https://img.shields.io/badge/Symfony-6-000000?style=for-the-badge&logo=symfony)
+![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=for-the-badge&logo=php)
+![Symfony](https://img.shields.io/badge/Symfony-7.4-000000?style=for-the-badge&logo=symfony)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100-009688?style=for-the-badge&logo=fastapi)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=for-the-badge&logo=fastapi)
 ![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?style=for-the-badge&logo=vue.js)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker)
+![CI](https://img.shields.io/github/actions/workflow/status/salim-atalla/polymind/fastapi.yml?style=for-the-badge&label=FastAPI+CI)
+![CI](https://img.shields.io/github/actions/workflow/status/salim-atalla/polymind/symfony.yml?style=for-the-badge&label=Symfony+CI)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 </div>
@@ -31,6 +33,9 @@ PolyMind analyzes your request and picks the best one for you, instantly.
 | 🎨 Image generation        | Gemini (Google)    |
 | ❓ General questions       | Best available     |
 
+> **Note:** Requires valid API keys for OpenAI, Anthropic, and/or Google Gemini.
+> The app works with at least one active key thanks to the automatic fallback system.
+
 ---
 
 ## 🏗️ Architecture
@@ -39,11 +44,25 @@ PolyMind analyzes your request and picks the best one for you, instantly.
 [Vue.js] → [Symfony API] → [FastAPI Router] → [OpenAI / Claude / Gemini]
 ```
 
--   **Vue.js** — Chat user interface
--   **Symfony 6** — Main backend, authentication, chat history
--   **FastAPI** — AI router microservice, prompt analysis, model selection
--   **PostgreSQL** — Users, conversations, messages storage
+-   **Vue.js 3** — Glassmorphism chat UI with conversation history
+-   **Symfony 7.4 (PHP 8.3)** — REST API, JWT authentication, chat history
+-   **FastAPI (Python 3.11)** — AI routing microservice, intent analysis
+-   **PostgreSQL 15** — Users, conversations, messages storage
 -   **Docker** — Full containerized environment
+
+---
+
+## ✨ Features
+
+-   🤖 **Automatic AI routing** — detects intent and picks the best model
+-   🔄 **Fallback system** — if one provider fails, tries the next automatically
+-   💬 **Conversation history** — all chats saved and resumable
+-   🔐 **JWT authentication** — secure register/login
+-   🎨 **Glassmorphism UI** — modern dark theme with animated effects
+-   📊 **AI metadata** — shows which model answered and response time
+-   📄 **API documentation** — Swagger UI on FastAPI + OpenAPI on Symfony
+-   🧪 **Test suites** — PHPUnit (Symfony) + Pytest (FastAPI)
+-   🔁 **CI/CD** — GitHub Actions for all three services
 
 ---
 
@@ -53,7 +72,7 @@ PolyMind analyzes your request and picks the best one for you, instantly.
 
 -   Docker & Docker Compose
 -   Git
--   API keys: OpenAI, Anthropic, Google Gemini
+-   API keys: OpenAI, Anthropic, and/or Google Gemini
 
 ### Installation
 
@@ -62,29 +81,58 @@ PolyMind analyzes your request and picks the best one for you, instantly.
 git clone https://github.com/salim-atalla/polymind.git
 cd polymind
 
-# 2. Copy environment file
-cp .env.example .env
+# 2. Set up FastAPI environment
+cp fastapi-router/.env.example fastapi-router/.env
+# Edit fastapi-router/.env and add your API keys:
+# OPENAI_API_KEY=your_key_here
+# ANTHROPIC_API_KEY=your_key_here
+# GEMINI_API_KEY=your_key_here
 
-# 3. Add your API keys in .env
-OPENAI_API_KEY=your_key_here
-ANTHROPIC_API_KEY=your_key_here
-GEMINI_API_KEY=your_key_here
+# 3. Set up Symfony environment
+cp symfony-app/.env symfony-app/.env.local
+# Edit symfony-app/.env.local and update:
+# DATABASE_URL, JWT_PASSPHRASE
 
-# 4. Start the application
-docker-compose up -d
+# 4. Generate JWT keys
+cd symfony-app
+mkdir -p config/jwt
+openssl genrsa -out config/jwt/private.pem 4096
+openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+cd ..
 
-# 5. Run migrations
-docker-compose exec symfony-app php bin/console doctrine:migrations:migrate
+# 5. Start all services
+docker compose up -d
+
+# 6. Run Symfony migrations
+docker compose exec symfony-app php bin/console doctrine:migrations:migrate
+```
+
+### Manual Setup (without Docker)
+
+```bash
+# Terminal 1 — Symfony backend
+cd symfony-app
+php -S localhost:8080 -t public/ public/router.php
+
+# Terminal 2 — FastAPI router
+cd fastapi-router
+uvicorn app.main:app --reload --port 8000
+
+# Terminal 3 — Vue.js frontend
+cd frontend
+npm install
+npm run dev
 ```
 
 ### Access
 
-| Service            | URL                        |
-| ------------------ | -------------------------- |
-| Frontend (Vue.js)  | http://localhost:5173      |
-| Symfony API        | http://localhost:8080      |
-| FastAPI Router     | http://localhost:8000      |
-| API Docs (Swagger) | http://localhost:8000/docs |
+| Service            | URL                                        |
+| ------------------ | ------------------------------------------ |
+| Frontend (Vue.js)  | http://localhost:5173                      |
+| Symfony API        | http://localhost:8080                      |
+| FastAPI Router     | http://localhost:8000                      |
+| FastAPI Swagger UI | http://localhost:8000/docs                 |
+| Symfony API Docs   | http://localhost:8080/api/doc.json/default |
 
 ---
 
@@ -93,14 +141,20 @@ docker-compose exec symfony-app php bin/console doctrine:migrations:migrate
 ```
 polymind/
 ├── .github/
-│   ├── workflows/          # CI/CD pipelines
-│   └── ISSUE_TEMPLATE/     # Bug report, Feature request
+│   ├── workflows/
+│   │   ├── fastapi.yml     # FastAPI CI (Pytest)
+│   │   ├── symfony.yml     # Symfony CI (PHPUnit)
+│   │   └── vue.yml         # Vue.js CI (Build)
+│   └── ISSUE_TEMPLATE/
 ├── docs/
-│   ├── uml/                # UML diagrams
-│   └── api/                # API documentation
-├── symfony-app/            # PHP Symfony backend
-├── fastapi-router/         # Python AI router
-├── frontend/               # Vue.js chat interface
+│   └── uml/
+│       ├── sequence.puml
+│       ├── use-case.puml
+│       ├── class-diagram.puml
+│       └── architecture.md
+├── symfony-app/            # PHP 8.3 / Symfony 7.4 backend
+├── fastapi-router/         # Python 3.11 / FastAPI AI router
+├── frontend/               # Vue.js 3 chat interface
 ├── docker-compose.yml
 └── README.md
 ```
@@ -110,19 +164,23 @@ polymind/
 ## 🧪 Running Tests
 
 ```bash
-# Symfony (PHPUnit)
-docker-compose exec symfony-app php bin/phpunit
-
 # FastAPI (Pytest)
-docker-compose exec fastapi-router pytest
+cd fastapi-router
+pytest tests/ -v
+
+# Symfony (PHPUnit)
+cd symfony-app
+php bin/phpunit --testdox
 ```
 
 ---
 
 ## 📄 Documentation
 
--   [Architecture & UML Diagrams](./docs/uml/)
--   [API Documentation](http://localhost:8000/docs)
+-   [Architecture Diagram](./docs/uml/architecture.md)
+-   [UML Diagrams](./docs/uml/)
+-   [FastAPI Swagger UI](http://localhost:8000/docs)
+-   [Symfony OpenAPI Schema](http://localhost:8080/api/doc.json/default)
 
 ---
 
