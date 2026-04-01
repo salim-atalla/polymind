@@ -4,6 +4,7 @@
 
 ### One chat interface. Multiple AI brains. Always the right one.
 
+![Version](https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge)
 ![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=for-the-badge&logo=php)
 ![Symfony](https://img.shields.io/badge/Symfony-7.4-000000?style=for-the-badge&logo=symfony)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python)
@@ -201,6 +202,34 @@ php bin/phpunit --testdox
 -   [UML Diagrams](./docs/uml/)
 -   [FastAPI Swagger UI](http://localhost:8000/docs)
 -   [Symfony OpenAPI Schema](http://localhost:8080/api/doc.json/default)
+
+---
+
+## 🗺️ Roadmap
+
+### v1.0.0 ✅ Current
+
+-   AI routing via LLM intent analysis
+-   JWT Authentication
+-   Conversation history
+-   Glassmorphism UI
+-   CI/CD pipelines
+
+### v2.0.0 🔲 In Development
+
+-   [ ] Quiz app for community data collection
+-   [ ] Custom ML classifier (scikit-learn)
+-   [ ] Replace LLM router with trained model
+-   [ ] Model retraining pipeline
+-   [ ] Streaming responses
+-   [ ] Admin dashboard (usage stats + model accuracy)
+
+### v3.0.0 💡 Vision
+
+-   [ ] Fine-tuned BERT classifier
+-   [ ] Mobile app (React Native)
+-   [ ] Deploy on VPS
+-   [ ] Multi-language support
 
 ---
 
