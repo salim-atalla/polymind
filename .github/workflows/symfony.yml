@@ -40,11 +40,15 @@ jobs:
           cat > .env << 'EOF'
           APP_ENV=test
           APP_SECRET=test_secret_for_ci
-          DATABASE_URL="postgresql://user:password@127.0.0.1:5432/polymind_test?serverVersion=15"
+          DATABASE_URL="postgresql://user:password@127.0.0.1:5432/polymind_test?serverVersion=15&charset=utf8"
           JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
           JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
           JWT_PASSPHRASE=test_passphrase
           FASTAPI_URL=http://localhost:8000
+          FASTAPI_HOST=0.0.0.0
+          FASTAPI_PORT=8000
+          CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+          DEFAULT_URI="http://localhost:8000"
           EOF
       - name: Install dependencies
         working-directory: symfony-app
