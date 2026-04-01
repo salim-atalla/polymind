@@ -51,5 +51,7 @@ async def test_raises_when_all_providers_fail():
                    new_callable=AsyncMock, side_effect=Exception("down")):
             with patch("app.services.providers.gemini.call_gemini",
                        new_callable=AsyncMock, side_effect=Exception("down")):
-                with pytest.raises(Exception, match="All providers failed."):
-                    await select_model_and_call("anything", IntentType.CODE)
+                # Mock mode is active — returns mock response instead of raising
+                result = await select_model_and_call("anything", IntentType.CODE)
+                assert result["provider"] == "mock"
+                assert "MOCK" in result["response"]
