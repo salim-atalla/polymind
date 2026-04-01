@@ -66,6 +66,26 @@ PolyMind analyzes your request and picks the best one for you, instantly.
 
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+
+### 🔐 Authentication
+
+![Register](docs/screenshots/register.png)
+
+### 💬 Chat Interface
+
+![Chat](docs/screenshots/chat.png)
+
+### 🤖 AI Response with Model Badge
+
+![Conversation](docs/screenshots/conversation.png)
+
+</div>
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
