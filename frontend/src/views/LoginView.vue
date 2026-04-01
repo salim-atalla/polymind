@@ -84,11 +84,22 @@ async function handleLogin() {
     loading.value = true;
     error.value = "";
     try {
+        // 1. Get token
         const { data } = await api.post("/api/auth/login", form.value);
-        auth.setAuth(data.token, data.user);
+
+        // 2. Temporarily set token so the next request is authenticated
+        localStorage.setItem("token", data.token);
+
+        // 3. Fetch user profile
+        const { data: userData } = await api.get("/api/auth/me");
+
+        // 4. Set both in store
+        auth.setAuth(data.token, userData);
+
         router.push("/chat");
     } catch (e) {
         error.value = e.response?.data?.message || "Invalid credentials";
+        localStorage.removeItem("token");
     } finally {
         loading.value = false;
     }
