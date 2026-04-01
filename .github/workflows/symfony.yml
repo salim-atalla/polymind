@@ -1,60 +1,56 @@
 name: Symfony CI
 
 on:
-    push:
-        branches: [main, develop]
-        paths:
-            - "symfony-app/**"
-    pull_request:
-        branches: [main, develop]
-        paths:
-            - "symfony-app/**"
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        services:
-            postgres:
-                image: postgres:15-alpine
-                env:
-                    POSTGRES_DB: polymind_test
-                    POSTGRES_USER: user
-                    POSTGRES_PASSWORD: password
-                ports:
-                    - 5432:5432
-                options: >-
-                    --health-cmd pg_isready
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
-        steps:
-            - uses: actions/checkout@v4
-            - uses: shivammathur/setup-php@v2
-              with:
-                  php-version: "8.3"
-                  extensions: pdo, pdo_pgsql, zip, intl
-            - name: Cache Composer
-              uses: actions/cache@v4
-              with:
-                  path: symfony-app/vendor
-                  key: composer-${{ hashFiles('symfony-app/composer.lock') }}
-            - name: Install dependencies
-              working-directory: symfony-app
-              run: composer install --no-interaction --prefer-dist --optimize-autoloader
-            - name: Create .env.test.local
-              working-directory: symfony-app
-              run: |
-                  echo "DATABASE_URL=postgresql://user:password@127.0.0.1:5432/polymind_test?serverVersion=15" > .env.test.local
-                  echo "JWT_PASSPHRASE=test_passphrase" >> .env.test.local
-            - name: Generate JWT keys
-              working-directory: symfony-app
-              run: |
-                  mkdir -p config/jwt
-                  openssl genrsa -out config/jwt/private.pem 2048
-                  openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
-            - name: Run migrations
-              working-directory: symfony-app
-              run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
-            - name: Run PHPUnit
-              working-directory: symfony-app
-              run: php bin/phpunit --testdox
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: polymind_test
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo, pdo_pgsql, zip, intl
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: symfony-app/vendor
+          key: composer-${{ hashFiles('symfony-app/composer.lock') }}
+      - name: Install dependencies
+        working-directory: symfony-app
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      - name: Create .env.test.local
+        working-directory: symfony-app
+        run: |
+          echo "DATABASE_URL=postgresql://user:password@127.0.0.1:5432/polymind_test?serverVersion=15" > .env.test.local
+          echo "JWT_PASSPHRASE=test_passphrase" >> .env.test.local
+      - name: Generate JWT keys
+        working-directory: symfony-app
+        run: |
+          mkdir -p config/jwt
+          openssl genrsa -out config/jwt/private.pem 2048
+          openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+      - name: Run migrations
+        working-directory: symfony-app
+        run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
+      - name: Run PHPUnit
+        working-directory: symfony-app
+        run: php bin/phpunit --testdox
