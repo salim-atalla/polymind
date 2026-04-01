@@ -1,0 +1,49 @@
+name: FastAPI CI
+
+on:
+    push:
+        branches: [main, develop]
+        paths:
+            - "fastapi-router/**"
+    pull_request:
+        branches: [main, develop]
+        paths:
+            - "fastapi-router/**"
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+                  cache: "pip"
+                  cache-dependency-path: fastapi-router/requirements.txt
+
+            - name: Install dependencies
+              working-directory: fastapi-router
+              run: pip install -r requirements.txt
+
+            - name: Create .env file
+              working-directory: fastapi-router
+              run: |
+                  cp .env.example .env
+                  echo "OPENAI_API_KEY=fake_key_for_tests" >> .env
+                  echo "ANTHROPIC_API_KEY=fake_key_for_tests" >> .env
+                  echo "GEMINI_API_KEY=fake_key_for_tests" >> .env
+
+            - name: Run Pytest
+              working-directory: fastapi-router
+              run: pytest tests/ -v --tb=short
+
+            - name: Upload test results
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: fastapi-test-results
+                  path: fastapi-router/.pytest_cache
