@@ -4,7 +4,12 @@ import api from "../services/api";
 
 export const useAuthStore = defineStore("auth", () => {
     const token = ref(localStorage.getItem("token") || null);
-    const user = ref(JSON.parse(localStorage.getItem("user") || "null"));
+
+    // Fix: safely parse user from localStorage
+    const storedUser = localStorage.getItem("user");
+    const user = ref(
+        storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null
+    );
 
     const isAuthenticated = computed(() => !!token.value);
 

@@ -127,6 +127,25 @@
                 </div>
             </div>
 
+            <!-- Error message -->
+            <div v-if="chat.error" class="message-wrapper assistant">
+                <div class="message assistant-message error-message">
+                    <div class="ai-badge-row">
+                        <span
+                            class="ai-badge"
+                            style="
+                                background: rgba(239, 68, 68, 0.15);
+                                border-color: rgba(239, 68, 68, 0.3);
+                                color: #fca5a5;
+                            "
+                        >
+                            ⚠️ Error
+                        </span>
+                    </div>
+                    <div class="message-content">{{ chat.error }}</div>
+                </div>
+            </div>
+
             <!-- Input area -->
             <div class="input-area">
                 <div class="glass input-wrapper">
@@ -232,7 +251,8 @@ async function send() {
 
         await scrollToBottom();
     } catch (e) {
-        console.error(e);
+        await scrollToBottom();
+        console.error("Send error:", e);
     }
 }
 

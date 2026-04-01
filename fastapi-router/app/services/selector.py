@@ -45,4 +45,13 @@ async def select_model_and_call(prompt: str, intent: IntentType) -> dict:
             except Exception as e:
                 logger.warning(f"Fallback '{fallback_name}' failed: {e}")
 
+        # Mock response for development when all providers fail
+        logger.warning("All providers failed — returning mock response for development")
+        return {
+            "response": f"[MOCK RESPONSE] This is a development mock for: '{prompt}'. "
+                        f"Add valid API keys to get real responses.",
+            "model":    "mock-model",
+            "provider": "mock",
+        }
+
         raise Exception("All providers failed.")
